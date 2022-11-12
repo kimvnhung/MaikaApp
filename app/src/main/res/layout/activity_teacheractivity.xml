@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".TeacherActivity">
+    <LinearLayout
+        android:id="@+id/main_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/can_bo"
+            android:textStyle="bold"
+            android:textSize="25sp"
+            android:textColor="@color/black"
+            android:layout_marginStart="@dimen/padding_login"
+            android:layout_marginTop="@dimen/small_login_padding"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/padding_login"
+            android:paddingEnd="@dimen/padding_login"
+            android:orientation="vertical"
+            android:layout_marginTop="@dimen/padding_login">
+            <Button
+                android:id="@+id/lich_cong_tac_btn"
+                android:layout_width="@dimen/function_btn_width"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/teacher_lich_ctac"
+                android:paddingBottom="@dimen/padding_login"/>
+            <Button
+                android:layout_width="@dimen/function_btn_width"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/teacher_lich_hoat_dong"
+                android:paddingTop="@dimen/padding_login"
+                android:paddingBottom="@dimen/padding_login"/>
+            <Button
+                android:layout_width="@dimen/function_btn_width"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:paddingBottom="@dimen/padding_login"
+                android:paddingTop="@dimen/padding_login"
+                android:text="@string/teacher_thong_tin_hs"
+                />
+
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>

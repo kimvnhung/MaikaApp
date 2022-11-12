@@ -3,4 +3,13 @@
     <string name="button_new_request">New Request</string>
     <string name="button_retry">Retry</string>
     <string name="button_listening">Listening</string>
+    <string name="username">Tên tài khoản:</string>
+    <string name="password">Mật khẩu:</string>
+    <string name="login_text">Đăng nhập</string>
+    <string name="login_hint_text"><u>Không có tài khoản? Đăng nhập dưới dạng khách</u></string>
+    <string name="maika_bot">Maika Bot</string>
+    <string name="teacher_lich_ctac">Lịch công tác</string>
+    <string name="can_bo">Cán bộ</string>
+    <string name="teacher_lich_hoat_dong">Lịch hoạt động</string>
+    <string name="teacher_thong_tin_hs">Thông tin học sinh</string>
 </resources>

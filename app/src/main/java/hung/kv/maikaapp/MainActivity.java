@@ -12,6 +12,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import java.util.List;
+
 import hung.kv.maikaapp.database.DataManager;
 
 public class MainActivity extends AppCompatActivity {
@@ -20,7 +22,8 @@ public class MainActivity extends AppCompatActivity {
     private String[] PERMISSION_NAME = new String[]{
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.INTERNET
+            Manifest.permission.INTERNET,
+            Manifest.permission.RECORD_AUDIO
     };
 
     Button assistantQueryBtn;
@@ -45,6 +48,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+//    @Override
+//    protected void receiveWhatWasHeard(List<String> heard, float[] confidenceScores) {
+//        Log.d(TAG,"receiveWhatWasHerad");
+//    }
+
     // Function to check and request permission
     public void checkPermission(String permission, int requestCode)
     {
@@ -65,4 +73,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+//    @Override
+//    public void onPointerCaptureChanged(boolean hasCapture) {
+//        super.onPointerCaptureChanged(hasCapture);
+//        Log.d(TAG,"onPointerCapture")
+//    }
 }

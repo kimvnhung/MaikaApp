@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="txt_size_lv3">15sp</dimen>
+    <dimen name="padding_login">20dp</dimen>
+    <dimen name="login_txt_title_width">120dp</dimen>
+    <dimen name="login_margin_top">150dp</dimen>
+    <dimen name="login_btn_margin_end">70dp</dimen>
+    <dimen name="small_login_padding">10dp</dimen>
+    <dimen name="txt_size_lv5">40sp</dimen>
+    <dimen name="function_btn_width">200dp</dimen>
+</resources>
