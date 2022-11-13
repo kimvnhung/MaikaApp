@@ -8,4 +8,5 @@
     <dimen name="small_login_padding">10dp</dimen>
     <dimen name="txt_size_lv5">40sp</dimen>
     <dimen name="function_btn_width">200dp</dimen>
+    <dimen name="small_margin">5dp</dimen>
 </resources>

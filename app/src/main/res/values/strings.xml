@@ -12,4 +12,7 @@
     <string name="can_bo">Cán bộ</string>
     <string name="teacher_lich_hoat_dong">Lịch hoạt động</string>
     <string name="teacher_thong_tin_hs">Thông tin học sinh</string>
+    <string name="ten_can_bo">Tên Cán Bộ</string>
+    <string name="connect_string">-</string>
+    <string name="chuc_vu">Chức vụ</string>
 </resources>

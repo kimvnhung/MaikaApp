@@ -8,9 +8,25 @@ import android.speech.SpeechRecognizer;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 
+import com.google.api.client.util.Maps;
+import com.google.api.gax.rpc.ApiException;
+import com.google.cloud.dialogflow.v2.DetectIntentResponse;
+import com.google.cloud.dialogflow.v2.QueryInput;
+import com.google.cloud.dialogflow.v2.QueryResult;
+import com.google.cloud.dialogflow.v2.SessionName;
+import com.google.cloud.dialogflow.v2.SessionsClient;
+import com.google.cloud.dialogflow.v2.TextInput;
+
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import hung.kv.maikaapp.R;
+import maikadata.Maikadata;
+
 
 public class MaikaAssistant implements AssistantLifeCycle, SpeechDetector.SpeechDetectListenner, TextToSpeech.OnUtteranceCompletedListener {
     private final String TAG = MaikaAssistant.class.getName();
@@ -87,7 +103,15 @@ public class MaikaAssistant implements AssistantLifeCycle, SpeechDetector.Speech
 //
 //            }
 //        } ,500);
-        start();
+//        start();
+//        ArrayList<String> texts = new ArrayList<>();
+//        texts.add("Hi");
+//        try {
+//            detectIntentTexts("goassistant-36628",texts,"sessionID","vi-VN");
+//        }catch (Exception e){
+//            Log.e(TAG,"error : "+e.getMessage());
+//        }
+        TestDialogFlow();
     }
 
 
@@ -165,6 +189,53 @@ public class MaikaAssistant implements AssistantLifeCycle, SpeechDetector.Speech
     public void onUtteranceCompleted(String s) {
         Log.d(TAG,"onUtteranceCompleted");
         isSpeaking = false;
+    }
+
+    public void TestDialogFlow(){
+        String result = Maikadata.dialogFlowQuery("goassistant-36628","sessionID","Xin chào","vi-VN");
+        Log.d(TAG,"result : "+result);
+    }
+
+    public Map<String, QueryResult> detectIntentTexts(
+            String projectId, List<String> texts, String sessionId, String languageCode)
+            throws IOException, ApiException {
+        Map<String, QueryResult> queryResults = Maps.newHashMap();
+        // Instantiates a client
+        try (SessionsClient sessionsClient = SessionsClient.create()) {
+            // Set the session name using the sessionId (UUID) and projectID (my-project-id)
+            SessionName session = SessionName.of(projectId, sessionId);
+            System.out.println("Session Path: " + session.toString());
+
+            // Detect intents for each text input
+            for (String text : texts) {
+                // Set the text (hello) and language code (en-US) for the query
+                TextInput.Builder textInput =
+                        TextInput.newBuilder().setText(text).setLanguageCode(languageCode);
+
+                // Build the query with the TextInput
+                QueryInput queryInput = QueryInput.newBuilder().setText(textInput).build();
+
+                // Performs the detect intent request
+                DetectIntentResponse response = sessionsClient.detectIntent(session, queryInput);
+
+                // Display the query result
+                QueryResult queryResult = response.getQueryResult();
+
+                System.out.println("====================");
+                System.out.format("Query Text: '%s'\n", queryResult.getQueryText());
+                System.out.format(
+                        "Detected Intent: %s (confidence: %f)\n",
+                        queryResult.getIntent().getDisplayName(), queryResult.getIntentDetectionConfidence());
+                System.out.format(
+                        "Fulfillment Text: '%s'\n",
+                        queryResult.getFulfillmentMessagesCount() > 0
+                                ? queryResult.getFulfillmentMessages(0).getText()
+                                : "Triggered Default Fallback Intent");
+
+                queryResults.put(text, queryResult);
+            }
+        }
+        return queryResults;
     }
 }
 
