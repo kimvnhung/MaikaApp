@@ -19,12 +19,16 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import hung.kv.maikaapp.database.DataManager;
+
 public class LoginActivity extends AppCompatActivity {
     private final String TAG = LoginActivity.class.getName();
 
     Button loginBtn;
     EditText usernameEdt,passwordEdt;
     TextView loginAsGuest;
+
+    static DataManager db = null;
 
     private String[] PERMISSION_NAME = new String[]{
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -56,6 +60,22 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         initView();
+
+        if (db == null){
+            db = new DataManager(this);
+        }
+
+        Thread update = new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                if (db != null){
+                    Log.d(TAG,"Start update");
+                    db.updateData();
+                }
+            }
+        };
+        update.start();
     }
 
     // Function to check and request permission
@@ -84,6 +104,13 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View view) {
                 switchSound(currentMode);
                 currentMode = !currentMode;
+            }
+        });
+        loginAsGuest.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+
+                return false;
             }
         });
     }

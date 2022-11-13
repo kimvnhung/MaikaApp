@@ -1,17 +1,17 @@
 package hung.kv.maikaapp.voicehandle;
 
 import android.content.Context;
-import android.media.AudioManager;
 import android.os.CountDownTimer;
 import android.os.Handler;
-import android.speech.SpeechRecognizer;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
-import hung.kv.maikaapp.R;
 import maikadata.Maikadata;
 
 
@@ -20,7 +20,7 @@ public class MaikaAssistant implements AssistantLifeCycle, SpeechDetector.Speech
 
     private final int tickCountDown = 1000;
     private final int detectKeywordInterval = 3000;
-    private final int detectCommandInterval = 5000;
+    private final int resetSessionInterval = 180000;
     private boolean isKeywordDetected = false;
     private boolean isSpeaking = false;
 
@@ -42,7 +42,7 @@ public class MaikaAssistant implements AssistantLifeCycle, SpeechDetector.Speech
         }
     };
 
-    CountDownTimer detectCommandTimer = new CountDownTimer(detectCommandInterval,tickCountDown) {
+    CountDownTimer resetSessionTimer = new CountDownTimer(resetSessionInterval,tickCountDown) {
         @Override
         public void onTick(long l) {
 
@@ -50,9 +50,7 @@ public class MaikaAssistant implements AssistantLifeCycle, SpeechDetector.Speech
 
         @Override
         public void onFinish() {
-            if (detector != null){
-                detector.stopListen();
-            }
+            isKeywordDetected = false;
         }
     };
 
@@ -94,7 +92,7 @@ public class MaikaAssistant implements AssistantLifeCycle, SpeechDetector.Speech
     @Override
     public void onResponse() {
         if (isKeywordDetected){
-            detectCommandTimer.start();
+            resetSessionTimer.start();
         }else {
             detectKeywordTimer.start();
         }
@@ -115,18 +113,45 @@ public class MaikaAssistant implements AssistantLifeCycle, SpeechDetector.Speech
 
     }
 
-    private void speak(String content) {
+    private void speak(Map<String,String> replacing, String content) {
         if (speaker != null ){
             isSpeaking = true;
             Log.d(TAG,"speak content : "+content);
+            Set keys = replacing.keySet();
+
+            for (Iterator i = keys.iterator(); i.hasNext(); ) {
+                String key = (String) i.next();
+                String value = replacing.get(key);
+                content = content.replace(key,value);
+            }
             speaker.speak(content,TextToSpeech.QUEUE_FLUSH, null,"");
         }
     }
 
+    private boolean detectKeyword(String content){
+        if (content.length() < 10 && content.toLowerCase().contains("maika")){
+            return true;
+        }
+        return false;
+    }
+
+
     @Override
     public void onDetectedSpeech(String result) {
         if (!result.isEmpty()){
-            speak(getResponse(result));
+            if (!isKeywordDetected){
+                isKeywordDetected = detectKeyword(result);
+            }
+
+            if (isKeywordDetected){
+                Map<String,String> jeyt = new HashMap<>();
+                jeyt.put("@user",user);
+                speak(jeyt,getResponse(result));
+            }
+
+            resetSessionTimer.cancel();
+        }else {
+            resetSessionTimer.start();
         }
         start();
     }

@@ -43,15 +43,10 @@ public class MainActivity extends AppCompatActivity {
         assistantQueryBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                init();
+
             }
         });
     }
-
-//    @Override
-//    protected void receiveWhatWasHeard(List<String> heard, float[] confidenceScores) {
-//        Log.d(TAG,"receiveWhatWasHerad");
-//    }
 
     // Function to check and request permission
     public void checkPermission(String permission, int requestCode)
@@ -65,17 +60,4 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void init(){
-        try {
-            DataManager.instance().downloadCSV(this);
-        }catch (Exception e) {
-            Log.d(TAG,"err : "+e.getMessage());
-        }
-    }
-
-//    @Override
-//    public void onPointerCaptureChanged(boolean hasCapture) {
-//        super.onPointerCaptureChanged(hasCapture);
-//        Log.d(TAG,"onPointerCapture")
-//    }
 }
