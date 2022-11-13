@@ -21,7 +21,6 @@ public class SpeechDetector implements RecognitionListener {
     SpeechDetectListenner listenner;
     Context mContext;
     private Intent listenIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-    private Intent listenIntent2 = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
 
 
     public SpeechDetector(Context context, SpeechDetectListenner listenner){
@@ -35,23 +34,14 @@ public class SpeechDetector implements RecognitionListener {
             speechRecognizer = SpeechRecognizer.createSpeechRecognizer(mContext);
             speechRecognizer.setRecognitionListener(this);
             switchSound(true);
-            listenIntent2.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                    RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-            listenIntent2.putExtra(RecognizerIntent.EXTRA_LANGUAGE,
-                    Locale.getDefault());
-            listenIntent2.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to text");
         }else {
             Log.e(TAG,"create speech recognizer failed or context is null");
         }
     }
 
-    public void listen(boolean isListenKeyword){
+    public void listen(){
         if (speechRecognizer != null){
-            if (isListenKeyword){
-                speechRecognizer.startListening(listenIntent);
-            }else {
-                speechRecognizer.startListening(listenIntent2);
-            }
+            speechRecognizer.startListening(listenIntent);
         }
     }
 
@@ -64,7 +54,6 @@ public class SpeechDetector implements RecognitionListener {
     @Override
     public void onReadyForSpeech(Bundle bundle) {
         Log.d(TAG,"onReadyForSpeech");
-//        switchSound(false);
     }
 
     @Override
