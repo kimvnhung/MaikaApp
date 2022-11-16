@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="txt_size_lv3">15sp</dimen>
+    <dimen name="txt_size_lv2">15sp</dimen>
     <dimen name="padding_login">20dp</dimen>
     <dimen name="login_txt_title_width">120dp</dimen>
     <dimen name="login_margin_top">150dp</dimen>
@@ -9,4 +9,8 @@
     <dimen name="txt_size_lv5">40sp</dimen>
     <dimen name="function_btn_width">200dp</dimen>
     <dimen name="small_margin">5dp</dimen>
+    <dimen name="txt_size_lv4">30sp</dimen>
+    <dimen name="txt_size_lv3_5">25sp</dimen>
+    <dimen name="txt_size_lv3">20sp</dimen>
+    <dimen name="big_padding">40dp</dimen>
 </resources>

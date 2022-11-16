@@ -26,7 +26,7 @@
             android:layout_height="wrap_content"
             android:text="@string/username"
             android:textColor="@color/black"
-            android:textSize="@dimen/txt_size_lv3"
+            android:textSize="@dimen/txt_size_lv2"
             android:textStyle="bold"/>
         <EditText
             android:id="@+id/username_edt"
@@ -42,7 +42,7 @@
             android:layout_width="@dimen/login_txt_title_width"
             android:layout_height="wrap_content"
             android:textColor="@color/black"
-            android:textSize="@dimen/txt_size_lv3"
+            android:textSize="@dimen/txt_size_lv2"
             android:textStyle="bold"
             android:text="@string/password"/>
         <EditText
@@ -62,6 +62,21 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="@dimen/login_btn_margin_end"/>
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/small_login_padding">
+        <TextView
+            android:id="@+id/hint_text_login"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#ff0000"
+            android:paddingStart="@dimen/padding_login"
+            android:paddingEnd="@dimen/padding_login"
+            android:paddingBottom="@dimen/small_login_padding"
+            android:layout_centerInParent="true"
+            android:textStyle="italic"/>
     </RelativeLayout>
     <RelativeLayout
         android:layout_width="match_parent"

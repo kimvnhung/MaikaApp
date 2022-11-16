@@ -9,9 +9,12 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -20,6 +23,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import hung.kv.maikaapp.database.DataManager;
+import hung.kv.maikaapp.database.SchoolPerson;
+import hung.kv.maikaapp.database.Student;
+import hung.kv.maikaapp.database.Teacher;
 
 public class LoginActivity extends AppCompatActivity {
     private final String TAG = LoginActivity.class.getName();
@@ -27,8 +33,11 @@ public class LoginActivity extends AppCompatActivity {
     Button loginBtn;
     EditText usernameEdt,passwordEdt;
     TextView loginAsGuest;
+    TextView hintText;
 
     static DataManager db = null;
+
+    Handler handler = new Handler();
 
     private String[] PERMISSION_NAME = new String[]{
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -90,11 +99,31 @@ public class LoginActivity extends AppCompatActivity {
 
     boolean currentMode = false;
     private void initView() {
+        usernameEdt = findViewById(R.id.username_edt);
+        passwordEdt = findViewById(R.id.password_edt);
+        hintText = findViewById(R.id.hint_text_login);
+
         loginBtn = findViewById(R.id.login_btn);
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startTeacherActivity();
+                String username = usernameEdt.getText().toString();
+                if (username.isEmpty()){
+                    hintText.setText("Tên tài khoản không được để trống!");
+                    return;
+                }
+
+                String password = passwordEdt.getText().toString();
+
+                SchoolPerson person = db.isValidAccount(username,password);
+
+                if (person == null){
+                    hintText.setText("Tài khoản hoặc mật khẩu không đúng!");
+                }else if (person instanceof Student){
+                    startStudentActivity((Student) person);
+                }else {
+                    startTeacherActivity((Teacher) person);
+                }
             }
         });
 
@@ -102,15 +131,7 @@ public class LoginActivity extends AppCompatActivity {
         loginAsGuest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                switchSound(currentMode);
-                currentMode = !currentMode;
-            }
-        });
-        loginAsGuest.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-
-                return false;
+                startGuestActivity();
             }
         });
     }
@@ -125,17 +146,37 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private void startTeacherActivity(){
-        Intent startIntent = new Intent(this,TeacherActivity.class);
-        startIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(startIntent);
+    private void startTeacherActivity(Teacher teacher){
+        if (db != null && !db.isUpdating()){
+            Intent startIntent = new Intent(this,TeacherActivity.class);
+            startIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startIntent.putExtra("username",teacher.getUsername());
+            startIntent.putExtra("password",teacher.getPassword());
+            startActivity(startIntent);
+        }else {
+            handler.postDelayed(()->startTeacherActivity(teacher),500);
+        }
     }
 
-    private void startStudentActivity(){
-
+    private void startStudentActivity(Student student){
+        if (db != null && !db.isUpdating()){
+            Intent startIntent = new Intent(this,StudentActivity.class);
+            startIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startIntent.putExtra("username",student.getUsername());
+            startIntent.putExtra("password",student.getPassword());
+            startActivity(startIntent);
+        }else {
+            handler.postDelayed(()->startStudentActivity(student),500);
+        }
     }
 
     private void startGuestActivity(){
-
+        if (db != null && !db.isUpdating()){
+            Intent startIntent = new Intent(this,GuestActivity.class);
+            startIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(startIntent);
+        }else {
+            handler.postDelayed(()->startGuestActivity(),500);
+        }
     }
 }

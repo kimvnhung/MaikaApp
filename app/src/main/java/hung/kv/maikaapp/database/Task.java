@@ -1,15 +1,19 @@
 package hung.kv.maikaapp.database;
 
+
+import android.util.Log;
+
 import java.util.Date;
 
 public class Task {
     private String name = "";
-    private Date time;
+    private Date from,to;
     private String place = "";
 
-    public Task(String name, Date time, String place) {
+    public Task(String name,String place, Date from, Date to) {
         this.name = name;
-        this.time = time;
+        this.from = from;
+        this.to = to;
         this.place = place;
     }
 
@@ -21,12 +25,20 @@ public class Task {
         this.name = name;
     }
 
-    public Date getTime() {
-        return time;
+    public Date getFrom() {
+        return from;
     }
 
-    public void setTime(Date time) {
-        this.time = time;
+    public void setFrom(Date from) {
+        this.from = from;
+    }
+
+    public Date getTo() {
+        return to;
+    }
+
+    public void setTo(Date to) {
+        this.to = to;
     }
 
     public String getPlace() {
@@ -35,5 +47,23 @@ public class Task {
 
     public void setPlace(String place) {
         this.place = place;
+    }
+
+    public int getPeriodStart() {
+        int hours = from.getHours();
+        return (hours-7)+1;
+    }
+
+    public boolean isProcessing(){
+        Log.d("Task ",from.toString()+" "+new Date().toString()+" "+to.toString());
+        Date currentTime = new Date();
+        if (from.before(currentTime) && to.after(currentTime)){
+            return true;
+        }
+        return false;
+    }
+
+    public String toString() {
+        return "Task : "+name+" "+place+" "+DataManager.GetDayInWeek(from)+" "+getPeriodStart();
     }
 }

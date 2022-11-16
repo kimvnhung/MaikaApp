@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".TeacherActivity">
     <LinearLayout
-        android:id="@+id/main_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -18,18 +17,20 @@
                 android:layout_height="wrap_content"
                 android:text="@string/can_bo"
                 android:textStyle="bold"
-                android:textSize="25sp"
+                android:textSize="@dimen/txt_size_lv3_5"
                 android:textColor="@color/black"
                 android:layout_marginStart="@dimen/padding_login"
                 android:layout_marginTop="@dimen/small_login_padding"/>
         </RelativeLayout>
         <LinearLayout
+            android:id="@+id/main_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingStart="@dimen/padding_login"
             android:paddingEnd="@dimen/padding_login"
             android:orientation="vertical"
-            android:layout_marginTop="@dimen/padding_login">
+            android:layout_marginTop="@dimen/padding_login"
+            android:visibility="visible">
             <Button
                 android:id="@+id/lich_cong_tac_btn"
                 android:layout_width="@dimen/function_btn_width"
@@ -39,13 +40,15 @@
                 android:paddingBottom="@dimen/padding_login"
                 android:paddingTop="@dimen/padding_login"/>
             <Button
+                android:id="@+id/tkb_gv_btn"
                 android:layout_width="@dimen/function_btn_width"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="@string/teacher_lich_hoat_dong"
+                android:text="@string/thoi_khoa_bieu"
                 android:paddingTop="@dimen/padding_login"
                 android:paddingBottom="@dimen/padding_login"/>
             <Button
+                android:id="@+id/hs_tt_btn"
                 android:layout_width="@dimen/function_btn_width"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -53,7 +56,215 @@
                 android:paddingTop="@dimen/padding_login"
                 android:text="@string/teacher_thong_tin_hs"
                 />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/tkb_gv_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/thoi_khoa_bieu"
+                    android:textSize="@dimen/txt_size_lv3"
+                    android:textColor="@color/black"
+                    android:layout_marginStart="@dimen/big_padding"/>
+                <TextView
+                    android:id="@+id/back_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/back"
+                    android:textColor="@color/design_default_color_primary"
+                    android:textSize="@dimen/txt_size_lv2"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="@dimen/small_login_padding"/>
+            </RelativeLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/thu"
+                        android:textColor="@color/white"
+                        android:padding="@dimen/small_login_padding"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:background="@color/design_default_color_primary"
+                        android:layout_marginStart="1dp"
+                        android:layout_marginEnd="1dp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/tiet"
+                        android:textColor="@color/white"
+                        android:padding="@dimen/small_login_padding"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:background="@color/design_default_color_primary"
+                        android:layout_marginStart="1dp"
+                        android:layout_marginEnd="1dp"/>
+                    <TextView
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:text="@string/mon"
+                        android:textColor="@color/white"
+                        android:background="@color/design_default_color_primary"
+                        android:padding="@dimen/small_login_padding"
+                        android:layout_weight="6"
+                        android:gravity="center"
+                        android:layout_marginStart="1dp"
+                        android:layout_marginEnd="1dp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/lop"
+                        android:textColor="@color/white"
+                        android:background="@color/design_default_color_primary"
+                        android:padding="@dimen/small_login_padding"
+                        android:layout_weight="3"
+                        android:gravity="center"
+                        android:layout_marginStart="1dp"
+                        android:layout_marginEnd="1dp"/>
+                </LinearLayout>
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="500dp">
+                    <TableLayout
+                        android:id="@+id/tkb_gv_table"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <TableRow>
+                            <TextView
+                                android:text="@string/_2"
+                                android:textSize="@dimen/txt_size_lv3"
+                                android:textColor="@color/black"
+                                android:gravity="center"
+                                android:layout_weight="1"/>
+                            <TextView
+                                android:text="@string/_1"
+                                android:textSize="@dimen/txt_size_lv2"
+                                android:textColor="@color/black"
+                                android:gravity="center"
+                                android:layout_weight="1"/>
+                            <TextView
+                                android:text="@string/ten_mon"
+                                android:textColor="@color/black"
+                                android:gravity="center"
+                                android:textSize="@dimen/txt_size_lv2"
+                                android:layout_weight="6"/>
+                            <TextView
+                                android:text="@string/_6a1"
+                                android:textSize="@dimen/txt_size_lv2"
+                                android:textColor="@color/black"
+                                android:gravity="center"
+                                android:layout_weight="3"/>
+                        </TableRow>
+                    </TableLayout>
+                </ScrollView>
+            </LinearLayout>
 
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/lct_gv_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/teacher_lich_ctac"
+                    android:textSize="@dimen/txt_size_lv3"
+                    android:textColor="@color/black"
+                    android:layout_marginStart="@dimen/big_padding"/>
+                <TextView
+                    android:id="@+id/back_tv2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/back"
+                    android:textColor="@color/design_default_color_primary"
+                    android:textSize="@dimen/txt_size_lv2"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="@dimen/small_login_padding"/>
+            </RelativeLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/thu"
+                        android:textColor="@color/white"
+                        android:padding="@dimen/small_login_padding"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:background="@color/design_default_color_primary"
+                        android:layout_marginStart="1dp"
+                        android:layout_marginEnd="1dp"/>
+                    <TextView
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:text="@string/thoi_gian"
+                        android:textColor="@color/white"
+                        android:padding="@dimen/small_login_padding"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:background="@color/design_default_color_primary"
+                        android:layout_marginStart="1dp"
+                        android:layout_marginEnd="1dp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/noi_dung"
+                        android:textColor="@color/white"
+                        android:background="@color/design_default_color_primary"
+                        android:padding="@dimen/small_login_padding"
+                        android:layout_weight="6"
+                        android:gravity="center"
+                        android:layout_marginStart="1dp"
+                        android:layout_marginEnd="1dp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/dia_diem"
+                        android:textColor="@color/white"
+                        android:background="@color/design_default_color_primary"
+                        android:padding="@dimen/small_login_padding"
+                        android:layout_weight="2"
+                        android:gravity="center"
+                        android:layout_marginStart="1dp"
+                        android:layout_marginEnd="1dp"/>
+                </LinearLayout>
+            </LinearLayout>
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="500dp">
+                <TableLayout
+                    android:id="@+id/lct_gv_table"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                </TableLayout>
+            </ScrollView>
         </LinearLayout>
         <RelativeLayout
             android:layout_width="match_parent"
@@ -71,13 +282,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/ten_can_bo"
-                    android:textSize="@dimen/txt_size_lv3"
+                    android:textSize="@dimen/txt_size_lv2"
                     android:textColor="@color/design_default_color_primary"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/connect_string"
-                    android:textSize="@dimen/txt_size_lv3"
+                    android:textSize="@dimen/txt_size_lv2"
                     android:textColor="@color/design_default_color_primary"
                     android:layout_marginStart="@dimen/small_margin"
                     android:layout_marginEnd="@dimen/small_margin"/>
@@ -86,11 +297,17 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chuc_vu"
-                    android:textSize="@dimen/txt_size_lv3"
+                    android:textSize="@dimen/txt_size_lv2"
                     android:textColor="@color/design_default_color_primary"/>
             </LinearLayout>
 
         </RelativeLayout>
     </LinearLayout>
+    <LinearLayout
+        android:id="@+id/tkb_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
+    </LinearLayout>
 </RelativeLayout>
