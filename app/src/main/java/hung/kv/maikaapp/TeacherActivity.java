@@ -17,6 +17,7 @@ import android.widget.TextView;
 import hung.kv.maikaapp.database.DataManager;
 import hung.kv.maikaapp.database.Task;
 import hung.kv.maikaapp.database.Teacher;
+import hung.kv.maikaapp.voicehandle.UserType;
 
 public class TeacherActivity extends MaikaActivity {
     private static final String TAG = TeacherActivity.class.getName();
@@ -36,6 +37,8 @@ public class TeacherActivity extends MaikaActivity {
         String password = getIntent().getStringExtra("password");
 
         teacher = (Teacher) LoginActivity.db.isValidAccount(username,password);
+
+        initAssistant(teacher.getName(), UserType.TEACHER);
 
         initView();
     }
@@ -81,7 +84,7 @@ public class TeacherActivity extends MaikaActivity {
         tenCB = findViewById(R.id.ten_can_bo_tv);
         tenCB.setText(teacher.getName());
         chucVu = findViewById(R.id.chuc_vu_tv);
-        chucVu.setText("Giáo viên");
+        chucVu.setText(teacher.getChucVu());
 
         tkbTable = findViewById(R.id.tkb_gv_table);
         lctTable = findViewById(R.id.lct_gv_table);

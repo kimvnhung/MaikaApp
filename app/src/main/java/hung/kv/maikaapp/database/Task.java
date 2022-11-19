@@ -63,6 +63,21 @@ public class Task {
         return false;
     }
 
+    public boolean isProcessing(Date time){
+        if (from.before(time) && to.after(time)){
+            return true;
+        }
+        return false;
+    }
+
+    public String getBuoi(){
+        if (from.getHours() < 12){
+            return "sáng";
+        }
+
+        return "chiều";
+    }
+
     public String toString() {
         return "Task : "+name+" "+place+" "+DataManager.GetDayInWeek(from)+" "+getPeriodStart();
     }

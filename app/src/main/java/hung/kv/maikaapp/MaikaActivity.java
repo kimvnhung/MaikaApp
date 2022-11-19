@@ -1,17 +1,21 @@
 package hung.kv.maikaapp;
 
+import android.nfc.Tag;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import hung.kv.maikaapp.voicehandle.MaikaAssistant;
+import hung.kv.maikaapp.voicehandle.UserType;
 
 public class MaikaActivity extends AppCompatActivity {
     protected MaikaAssistant assistant = null;
 
-    protected void initAssistant(String user){
-        assistant = new MaikaAssistant(this,user);
+    protected void initAssistant(String user, UserType type){
+        Log.d("","initAssistant");
+        assistant = new MaikaAssistant(this,user,type);
     }
 
     @Override
@@ -27,6 +31,7 @@ public class MaikaActivity extends AppCompatActivity {
         super.onStop();
         if (assistant != null){
             assistant.finish();
+
         }
     }
 
@@ -43,6 +48,15 @@ public class MaikaActivity extends AppCompatActivity {
         super.onResume();
         if (assistant != null){
 //            assistant.start();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (assistant != null){
+            assistant.finish();
+
         }
     }
 }

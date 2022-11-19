@@ -27,7 +27,7 @@ import hung.kv.maikaapp.database.SchoolPerson;
 import hung.kv.maikaapp.database.Student;
 import hung.kv.maikaapp.database.Teacher;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity implements DataManager.LoadingDataListenner {
     private final String TAG = LoginActivity.class.getName();
 
     Button loginBtn;
@@ -35,7 +35,7 @@ public class LoginActivity extends AppCompatActivity {
     TextView loginAsGuest;
     TextView hintText;
 
-    static DataManager db = null;
+    public static DataManager db = null;
 
     Handler handler = new Handler();
 
@@ -71,20 +71,8 @@ public class LoginActivity extends AppCompatActivity {
         initView();
 
         if (db == null){
-            db = new DataManager(this);
+            db = new DataManager(this,this);
         }
-
-        Thread update = new Thread(){
-            @Override
-            public void run() {
-                super.run();
-                if (db != null){
-                    Log.d(TAG,"Start update");
-                    db.updateData();
-                }
-            }
-        };
-        update.start();
     }
 
     // Function to check and request permission
@@ -178,5 +166,15 @@ public class LoginActivity extends AppCompatActivity {
         }else {
             handler.postDelayed(()->startGuestActivity(),500);
         }
+    }
+
+    @Override
+    public void onDataLoadCompleted() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                findViewById(R.id.loading_layout).setVisibility(View.GONE);
+            }
+        });
     }
 }

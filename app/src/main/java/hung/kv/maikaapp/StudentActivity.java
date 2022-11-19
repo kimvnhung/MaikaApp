@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import hung.kv.maikaapp.database.DataManager;
 import hung.kv.maikaapp.database.Student;
 import hung.kv.maikaapp.database.Task;
+import hung.kv.maikaapp.voicehandle.UserType;
 
 public class StudentActivity extends MaikaActivity {
     private final String TAG = StudentActivity.class.getName();
@@ -38,6 +39,8 @@ public class StudentActivity extends MaikaActivity {
 
         student = (Student) LoginActivity.db.isValidAccount(username,password);
         Log.d(TAG,"student task count "+student.getTasks().size());
+
+        initAssistant(student.getName(), UserType.STUDENT);
 
         initView();
     }

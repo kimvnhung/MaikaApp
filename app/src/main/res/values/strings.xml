@@ -46,4 +46,5 @@
     <string name="back"><u>Back</u>></string>
     <string name="ten_mon">Tên môn</string>
     <string name="_6a1">6A1</string>
+    <string name="tai_du_lieu">Đang tải dữ liệu vui lòng chờ...</string>
 </resources>

@@ -116,6 +116,12 @@ public class SpeechDetector implements RecognitionListener {
         }
     }
 
+    public void destroy() {
+        if (speechRecognizer != null){
+            speechRecognizer.destroy();
+        }
+    }
+
     public interface SpeechDetectListenner {
         void onDetectedSpeech(String result);
     }

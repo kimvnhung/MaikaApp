@@ -18,6 +18,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import hung.kv.maikaapp.voicehandle.UserType;
+
 public class GuestActivity extends MaikaActivity {
 
     Button hdddBtn,meetingBtn;
@@ -30,6 +32,8 @@ public class GuestActivity extends MaikaActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_guest);
+
+        initAssistant("Bạn", UserType.GUEST);
 
         initView();
     }
@@ -118,7 +122,7 @@ public class GuestActivity extends MaikaActivity {
         List<String> categories = LoginActivity.db.getTeacherNames();
 
         // Creating adapter for spinner
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, categories);
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, categories);
 
         // Drop down layout style - list view with radio button
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

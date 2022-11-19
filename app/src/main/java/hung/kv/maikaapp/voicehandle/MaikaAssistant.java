@@ -6,12 +6,19 @@ import android.os.Handler;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 
+import com.google.api.services.drive.model.User;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
+import hung.kv.maikaapp.LoginActivity;
 import maikadata.Maikadata;
 
 
@@ -25,6 +32,7 @@ public class MaikaAssistant implements AssistantLifeCycle, SpeechDetector.Speech
     private boolean isSpeaking = false;
 
     TextToSpeech speaker = null;
+    TextToSpeech speakerOther = null;
     SpeechDetector detector;
 
 
@@ -51,15 +59,23 @@ public class MaikaAssistant implements AssistantLifeCycle, SpeechDetector.Speech
         @Override
         public void onFinish() {
             isKeywordDetected = false;
+            position = "";
+            destination = "";
         }
     };
 
+
+
     String user = "bạn";
+    UserType userType = UserType.GUEST;
     Handler handler = new Handler();
 
-    public MaikaAssistant(Context context,String user){
-        detector = new SpeechDetector(context,this);
+    String position = "";
+    String destination = "";
 
+    public MaikaAssistant(Context context,String user, UserType userType){
+        detector = new SpeechDetector(context,this);
+        this.userType = userType;
 
         speaker = new TextToSpeech(context, new TextToSpeech.OnInitListener() {
             @Override
@@ -67,6 +83,16 @@ public class MaikaAssistant implements AssistantLifeCycle, SpeechDetector.Speech
                 if (i != TextToSpeech.ERROR){
                     speaker.setLanguage(Locale.getDefault());
                     speaker.setOnUtteranceCompletedListener(MaikaAssistant.this);
+                }
+            }
+        });
+
+        speakerOther = new TextToSpeech(context, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int i) {
+                if (i != TextToSpeech.ERROR){
+                    speakerOther.setLanguage(Locale.SIMPLIFIED_CHINESE);
+                    speakerOther.setOnUtteranceCompletedListener(MaikaAssistant.this);
                 }
             }
         });
@@ -110,7 +136,8 @@ public class MaikaAssistant implements AssistantLifeCycle, SpeechDetector.Speech
 
     @Override
     public void finish() {
-
+        Log.d(TAG,"Stop listener");
+        detector.destroy();
     }
 
     private void speak(Map<String,String> replacing, String content) {
@@ -124,7 +151,11 @@ public class MaikaAssistant implements AssistantLifeCycle, SpeechDetector.Speech
                 String value = replacing.get(key);
                 content = content.replace(key,value);
             }
-            speaker.speak(content,TextToSpeech.QUEUE_FLUSH, null,"");
+            if (replacing.get("kem") != null && replacing.get("kem").equals("true")){
+                speakerOther.speak(content,TextToSpeech.QUEUE_FLUSH, null,"");
+            }else{
+                speaker.speak(content,TextToSpeech.QUEUE_FLUSH, null,"");
+            }
         }
     }
 
@@ -139,6 +170,7 @@ public class MaikaAssistant implements AssistantLifeCycle, SpeechDetector.Speech
     @Override
     public void onDetectedSpeech(String result) {
         if (!result.isEmpty()){
+            Log.d(TAG,"result "+result);
             if (!isKeywordDetected){
                 isKeywordDetected = detectKeyword(result);
             }
@@ -146,7 +178,106 @@ public class MaikaAssistant implements AssistantLifeCycle, SpeechDetector.Speech
             if (isKeywordDetected){
                 Map<String,String> jeyt = new HashMap<>();
                 jeyt.put("@user",user);
-                speak(jeyt,getResponse(result));
+                String rs = getResponse(result);
+                Log.d(TAG,"rs "+rs);
+                if (rs.contains("Gặp mặt")){
+                    String name = rs.substring(13);
+                    if (!name.equals("Tên")){
+                        String lic = LoginActivity.db.getLCT(name);
+                        rs = lic;
+                    }else {
+                        if (new Random().nextInt()%2==0){
+                            rs = "Bạn muốn gặp ai cơ?";
+                        }else {
+                            rs = "Bạn muốn gặp ai? Tôi không nghe rõ!";
+                        }
+                    }
+                }else if (rs.contains("Giờ")){
+                    Date toDay = new Date();
+                    rs = "Bây giờ là "+toDay.getHours()+" giờ "+toDay.getMinutes()+" phút";
+                }else if (result.toLowerCase().contains("kem")){
+                    jeyt.put("kem","true");
+                }else if(rs.contains("khóa biểu")){
+                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+                    try {
+                        Date date = format.parse(rs.replace("Thời khóa biểu",""));
+//                        String other = "";
+                        if (userType == UserType.TEACHER){
+                            rs = LoginActivity.db.getTkbGv(user,date);
+                        }else {
+                            rs = LoginActivity.db.getTkbHs(user,date);
+                        }
+                    } catch (ParseException e) {
+                        Log.e(TAG,"error : "+e.getMessage());
+                    }
+                }else if (rs.contains("Lịch hoạt động")){
+                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+                    try {
+                        Date date = format.parse(rs.replace("Lịch hoạt động",""));
+                        if (userType == UserType.TEACHER){
+                            rs = LoginActivity.db.getLHDGV(user,date);
+                        }else {
+                            rs = LoginActivity.db.getTkbHs(user,date);
+                        }
+                    } catch (ParseException e) {
+                        Log.e(TAG,"error : "+e.getMessage());
+                    }
+                }else if (rs.contains("Chỉ đường tới khu")){
+                    String place = rs.replace("Chỉ đường tới khu","");
+                    if (!place.isEmpty()){
+                        destination = place;
+                    }
+                    if (position.equals("")){
+
+                        int rd = new Random().nextInt();
+                        if (rd%3 == 0){
+                            rs = "Cho tôi biết vị trí xuất phát của bạn?";
+                        }else if (rd%3==1){
+                            rs = "Bạn đang ở đâu đó?";
+                        }else {
+                            rs = "Bạn đi từ đâu?";
+                        }
+                    }else if (place.equals("")){
+                        int rd = new Random().nextInt();
+                        if (rd%3 == 0){
+                            rs = "Bạn muốn đi tới đâu?";
+                        }else if (rd%3==1){
+                            rs = "Bạn cần tìm đường tới đâu?";
+                        }else {
+                            rs = "Bạn muốn đi tới chỗ nào nhỉ?";
+                        }
+                    }else {
+                        rs = LoginActivity.db.getHDD(position,place);
+                    }
+                }else if(rs.contains("Vị trí hiện tại")){
+                    String place = rs.replace("Vị trí hiện tại","");
+                    if (!place.isEmpty()){
+                        position = place;
+                    }
+                    if (destination.equals("")){
+
+                        int rd = new Random().nextInt();
+                        if (rd%3 == 0){
+                            rs = "Bạn muốn đi tới đâu?";
+                        }else if (rd%3==1){
+                            rs = "Bạn cần tìm đường tới đâu?";
+                        }else {
+                            rs = "Bạn muốn đi tới chỗ nào nhỉ?";
+                        }
+                    }else if (place.equals("")){
+                        int rd = new Random().nextInt();
+                        if (rd%3 == 0){
+                            rs = "Cho tôi biết vị trí xuất phát của bạn?";
+                        }else if (rd%3==1){
+                            rs = "Bạn đang ở đâu đó?";
+                        }else {
+                            rs = "Bạn đi từ đâu?";
+                        }
+                    }else {
+                        rs = LoginActivity.db.getHDD(position,destination);
+                    }
+                }
+                speak(jeyt,rs);
             }
 
             resetSessionTimer.cancel();
@@ -163,7 +294,16 @@ public class MaikaAssistant implements AssistantLifeCycle, SpeechDetector.Speech
     }
 
     public String getResponse(String question){
-        return Maikadata.dialogFlowQuery("goassistant-36628","sessionID",question,"vi-VN");
+        String result = "";
+        do {
+            result = Maikadata.dialogFlowQuery("goassistant-36628","sessionID",question,"vi-VN", LoginActivity.db.getToken());
+            if (result.isEmpty()){
+                if (LoginActivity.db.updateToken()){
+                    Log.d(TAG,"update ok");
+                }
+            }
+        }while (result.isEmpty());
+        return result;
     }
 
 
