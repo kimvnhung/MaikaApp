@@ -13,4 +13,5 @@
     <dimen name="txt_size_lv3_5">25sp</dimen>
     <dimen name="txt_size_lv3">20sp</dimen>
     <dimen name="big_padding">40dp</dimen>
+    <dimen name="save_pass_padding">80dp</dimen>
 </resources>

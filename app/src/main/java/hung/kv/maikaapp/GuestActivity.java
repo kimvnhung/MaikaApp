@@ -33,7 +33,7 @@ public class GuestActivity extends MaikaActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_guest);
 
-        initAssistant("Bạn", UserType.GUEST);
+        initAssistant("Bạn", UserType.GUEST,null);
 
         initView();
     }

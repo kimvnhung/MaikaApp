@@ -13,9 +13,9 @@ import hung.kv.maikaapp.voicehandle.UserType;
 public class MaikaActivity extends AppCompatActivity {
     protected MaikaAssistant assistant = null;
 
-    protected void initAssistant(String user, UserType type){
+    protected void initAssistant(String user, UserType type, MaikaAssistant.AssistanceControlListenner listenner){
         Log.d("","initAssistant");
-        assistant = new MaikaAssistant(this,user,type);
+        assistant = new MaikaAssistant(this,user,type, listenner);
     }
 
     @Override

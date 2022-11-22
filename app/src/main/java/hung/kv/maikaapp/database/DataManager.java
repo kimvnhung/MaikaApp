@@ -775,6 +775,23 @@ public class DataManager implements DownloadCompletedListenner {
         return "Bạn không có lịch công tác "+dateString;
     }
 
+    public SchoolPerson getUserByName(String name){
+        for (int i=0;i<students.size();i++){
+            if (name.equalsIgnoreCase(students.get(i).getName())){
+                return students.get(i);
+            }
+        }
+
+        for (int i=0;i<teachers.size();i++){
+            if (name.equalsIgnoreCase(teachers.get(i).getName())){
+                return teachers.get(i);
+            }
+        }
+
+        return null;
+    }
+
+
     public interface LoadingDataListenner {
         void onDataLoadCompleted();
     }

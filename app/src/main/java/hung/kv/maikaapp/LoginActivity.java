@@ -18,6 +18,8 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,14 +28,18 @@ import hung.kv.maikaapp.database.DataManager;
 import hung.kv.maikaapp.database.SchoolPerson;
 import hung.kv.maikaapp.database.Student;
 import hung.kv.maikaapp.database.Teacher;
+import hung.kv.maikaapp.voicehandle.MaikaAssistant;
+import hung.kv.maikaapp.voicehandle.UserType;
 
-public class LoginActivity extends AppCompatActivity implements DataManager.LoadingDataListenner {
+public class LoginActivity extends MaikaActivity implements DataManager.LoadingDataListenner, MaikaAssistant.AssistanceControlListenner {
     private final String TAG = LoginActivity.class.getName();
 
     Button loginBtn;
     EditText usernameEdt,passwordEdt;
     TextView loginAsGuest;
     TextView hintText;
+    CheckBox savePass;
+    boolean isSaveAcc = false;
 
     public static DataManager db = null;
 
@@ -68,6 +74,8 @@ public class LoginActivity extends AppCompatActivity implements DataManager.Load
             startActivity(intent);
         }
 
+        initAssistant("Bạn", UserType.GUEST,this);
+
         initView();
 
         if (db == null){
@@ -90,6 +98,18 @@ public class LoginActivity extends AppCompatActivity implements DataManager.Load
         usernameEdt = findViewById(R.id.username_edt);
         passwordEdt = findViewById(R.id.password_edt);
         hintText = findViewById(R.id.hint_text_login);
+        savePass = findViewById(R.id.save_acc_cb);
+        savePass.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                isSaveAcc = b;
+            }
+        });
+
+        if (Utils.GetPreference(this,"isSaveAcc",false)){
+            savePass.setChecked(true);
+            isSaveAcc = true;
+        }
 
         loginBtn = findViewById(R.id.login_btn);
         loginBtn.setOnClickListener(new View.OnClickListener() {
@@ -122,6 +142,12 @@ public class LoginActivity extends AppCompatActivity implements DataManager.Load
                 startGuestActivity();
             }
         });
+
+        if (isSaveAcc){
+            String[] acc = Utils.GetLastAccount(this);
+            usernameEdt.setText(acc[0]);
+            passwordEdt.setText(acc[1]);
+        }
     }
 
     private void switchSound(boolean isMute){
@@ -136,6 +162,11 @@ public class LoginActivity extends AppCompatActivity implements DataManager.Load
 
     private void startTeacherActivity(Teacher teacher){
         if (db != null && !db.isUpdating()){
+            if (isSaveAcc){
+                Utils.SaveLastAccount(this,teacher.getUsername(),teacher.getPassword());
+            }else{
+                Utils.SaveLastAccount(this,"","");
+            }
             Intent startIntent = new Intent(this,TeacherActivity.class);
             startIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startIntent.putExtra("username",teacher.getUsername());
@@ -148,6 +179,11 @@ public class LoginActivity extends AppCompatActivity implements DataManager.Load
 
     private void startStudentActivity(Student student){
         if (db != null && !db.isUpdating()){
+            if (isSaveAcc){
+                Utils.SaveLastAccount(this,student.getUsername(),student.getPassword());
+            }else {
+                Utils.SaveLastAccount(this,"","");
+            }
             Intent startIntent = new Intent(this,StudentActivity.class);
             startIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startIntent.putExtra("username",student.getUsername());
@@ -176,5 +212,31 @@ public class LoginActivity extends AppCompatActivity implements DataManager.Load
                 findViewById(R.id.loading_layout).setVisibility(View.GONE);
             }
         });
+    }
+
+    @Override
+    public void onLoggedIn(String username, String password) {
+        SchoolPerson person = db.isValidAccount(username,password);
+
+        if (person == null){
+            return;
+        }
+
+       if (person instanceof Student){
+            startStudentActivity((Student) person);
+        }else {
+            startTeacherActivity((Teacher) person);
+        }
+    }
+
+    @Override
+    public void onLoggedOut() {
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Utils.SavePreference(this,"isSaveAcc",isSaveAcc);
     }
 }

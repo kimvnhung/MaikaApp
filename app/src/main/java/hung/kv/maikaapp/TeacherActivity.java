@@ -17,9 +17,10 @@ import android.widget.TextView;
 import hung.kv.maikaapp.database.DataManager;
 import hung.kv.maikaapp.database.Task;
 import hung.kv.maikaapp.database.Teacher;
+import hung.kv.maikaapp.voicehandle.MaikaAssistant;
 import hung.kv.maikaapp.voicehandle.UserType;
 
-public class TeacherActivity extends MaikaActivity {
+public class TeacherActivity extends MaikaActivity implements MaikaAssistant.AssistanceControlListenner {
     private static final String TAG = TeacherActivity.class.getName();
     Button tkbBtn,lctBtn,tthsBtn;
     LinearLayout mainLayout,tkbLayout,lctLayout;
@@ -38,7 +39,7 @@ public class TeacherActivity extends MaikaActivity {
 
         teacher = (Teacher) LoginActivity.db.isValidAccount(username,password);
 
-        initAssistant(teacher.getName(), UserType.TEACHER);
+        initAssistant(teacher.getName(), UserType.TEACHER,this);
 
         initView();
     }
@@ -415,5 +416,15 @@ public class TeacherActivity extends MaikaActivity {
             lctLayout.setVisibility(View.GONE);
 
         }
+    }
+
+    @Override
+    public void onLoggedIn(String username, String password) {
+
+    }
+
+    @Override
+    public void onLoggedOut() {
+        this.finish();
     }
 }

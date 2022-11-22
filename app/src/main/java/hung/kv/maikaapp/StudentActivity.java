@@ -17,9 +17,10 @@ import java.util.ArrayList;
 import hung.kv.maikaapp.database.DataManager;
 import hung.kv.maikaapp.database.Student;
 import hung.kv.maikaapp.database.Task;
+import hung.kv.maikaapp.voicehandle.MaikaAssistant;
 import hung.kv.maikaapp.voicehandle.UserType;
 
-public class StudentActivity extends MaikaActivity {
+public class StudentActivity extends MaikaActivity implements MaikaAssistant.AssistanceControlListenner {
     private final String TAG = StudentActivity.class.getName();
 
     Button tkbBtn,lhdBtn;
@@ -40,7 +41,7 @@ public class StudentActivity extends MaikaActivity {
         student = (Student) LoginActivity.db.isValidAccount(username,password);
         Log.d(TAG,"student task count "+student.getTasks().size());
 
-        initAssistant(student.getName(), UserType.STUDENT);
+        initAssistant(student.getName(), UserType.STUDENT,this);
 
         initView();
     }
@@ -189,5 +190,15 @@ public class StudentActivity extends MaikaActivity {
             lhdLayout.setVisibility(View.GONE);
             tkb_layout.setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    public void onLoggedIn(String username, String password) {
+
+    }
+
+    @Override
+    public void onLoggedOut() {
+        this.finish();
     }
 }
