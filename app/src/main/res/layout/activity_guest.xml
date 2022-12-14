@@ -5,6 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".GuestActivity">
+    <include
+        layout="@layout/tini_bot_layout"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -116,6 +118,31 @@
                 android:paddingEnd="@dimen/big_padding"
                 android:layout_marginTop="@dimen/small_login_padding"
                 android:textColor="@color/black"/>
+            <RelativeLayout
+                android:id="@+id/map_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/so_do_nha_truong"
+                    android:layout_alignParentTop="true"/>
+                <ImageView
+                    android:id="@+id/start_point"
+                    android:layout_width="@dimen/point_size"
+                    android:layout_height="@dimen/point_size"
+                    android:src="@drawable/start"
+                    android:layout_marginTop="@dimen/location_nha_hieu_bo_top"
+                    android:layout_marginStart="@dimen/location_nha_hieu_bo_left"
+                    android:visibility="gone"/>
+                <ImageView
+                    android:id="@+id/destination_point"
+                    android:layout_width="@dimen/point_size"
+                    android:layout_height="@dimen/point_size"
+                    android:src="@drawable/destination"
+                    android:visibility="gone"/>
+
+            </RelativeLayout>
         </LinearLayout>
         <LinearLayout
             android:id="@+id/gap_mat_layout"

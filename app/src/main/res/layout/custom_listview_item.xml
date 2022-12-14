@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/suggest_background">
+    <TextView
+        android:id="@+id/item_tv"
+        android:text="@string/hello_world"
+        android:textStyle="bold"
+        android:textSize="@dimen/txt_size_lv2"
+        android:layout_width="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/small_login_padding"
+        android:layout_marginBottom="@dimen/small_login_padding"
+        android:layout_height="wrap_content"/>
+</RelativeLayout>

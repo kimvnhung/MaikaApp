@@ -243,5 +243,7 @@
 
         </RelativeLayout>
     </LinearLayout>
-
+    <include
+        android:id="@+id/include_layout"
+        layout="@layout/tini_bot_layout"/>
 </RelativeLayout>

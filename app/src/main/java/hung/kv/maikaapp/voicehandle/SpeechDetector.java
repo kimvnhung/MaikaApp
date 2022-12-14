@@ -21,7 +21,8 @@ public class SpeechDetector implements RecognitionListener {
     SpeechDetectListenner listenner;
     Context mContext;
     private Intent listenIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-
+    boolean isFakeResult = false;
+    String fakeResult = "";
 
     public SpeechDetector(Context context, SpeechDetectListenner listenner){
         this.listenner = listenner;
@@ -81,7 +82,7 @@ public class SpeechDetector implements RecognitionListener {
 //        Log.d(TAG,"onError");
 
         if (listenner != null){
-            Log.d(TAG,"error "+i);
+//            Log.d(TAG,"error "+i);
             listenner.onDetectedSpeech("");
         }
     }
@@ -92,7 +93,12 @@ public class SpeechDetector implements RecognitionListener {
         ArrayList<String> data = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
         Log.d(TAG,"result "+data.get(0));
         if (listenner != null){
-            listenner.onDetectedSpeech(data.get(0));
+            if (isFakeResult){
+                listenner.onDetectedSpeech(fakeResult);
+                isFakeResult = false;
+            }else{
+                listenner.onDetectedSpeech(data.get(0));
+            }
         }
     }
 
@@ -108,18 +114,25 @@ public class SpeechDetector implements RecognitionListener {
 
     private void switchSound(boolean isMute){
         Log.d(TAG,"isMute : "+isMute);
-        AudioManager audioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
-        if (isMute){
-            audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-        }else {
-            audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-        }
+//        AudioManager audioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
+//        if (isMute){
+//            audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+//        }else {
+//            audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+//        }
     }
 
     public void destroy() {
         if (speechRecognizer != null){
             speechRecognizer.destroy();
         }
+    }
+
+    public void fakeResult(String result) {
+        isFakeResult = true;
+        fakeResult = result;
+        stopListen();
+
     }
 
     public interface SpeechDetectListenner {

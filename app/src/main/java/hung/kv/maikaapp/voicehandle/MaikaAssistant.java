@@ -6,10 +6,10 @@ import android.os.Handler;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 
-import com.google.api.services.drive.model.User;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -19,7 +19,9 @@ import java.util.Random;
 import java.util.Set;
 
 import hung.kv.maikaapp.LoginActivity;
+import hung.kv.maikaapp.database.DataManager;
 import hung.kv.maikaapp.database.SchoolPerson;
+import hung.kv.maikaapp.database.Teacher;
 import maikadata.Maikadata;
 
 
@@ -27,8 +29,8 @@ public class MaikaAssistant implements AssistantLifeCycle, SpeechDetector.Speech
     private final String TAG = MaikaAssistant.class.getName();
 
     private final int tickCountDown = 1000;
-    private final int detectKeywordInterval = 3000;
-    private final int resetSessionInterval = 180000;
+    private final int detectKeywordInterval = 5000;
+    private final int resetSessionInterval = 18000;
     private final int resetLoginState = 15000;
     private boolean isKeywordDetected = false;
     private boolean isSpeaking = false;
@@ -64,6 +66,9 @@ public class MaikaAssistant implements AssistantLifeCycle, SpeechDetector.Speech
         @Override
         public void onFinish() {
             isKeywordDetected = false;
+            if (loggingListenner != null){
+                loggingListenner.onDetectingKeyword();
+            }
             position = "";
             destination = "";
         }
@@ -77,7 +82,7 @@ public class MaikaAssistant implements AssistantLifeCycle, SpeechDetector.Speech
 
         @Override
         public void onFinish() {
-            state = LoginState.LOGGED_OUT;
+//            state = LoginState.LOGGED_OUT;
             userTemplate = null;
         }
     };
@@ -95,6 +100,7 @@ public class MaikaAssistant implements AssistantLifeCycle, SpeechDetector.Speech
         this.userType = userType;
         if (userType != UserType.GUEST){
             state= LoginState.LOGGED_IN;
+            isKeywordDetected = true;
         }else {
             state = LoginState.LOGGED_OUT;
         }
@@ -137,6 +143,17 @@ public class MaikaAssistant implements AssistantLifeCycle, SpeechDetector.Speech
 
     }
 
+    public void fakeResult(String result) {
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (detector != null){
+                    detector.fakeResult(result);
+                    isKeywordDetected = true;
+                }
+            }
+        },100);
+    }
 
     @Override
     public void onDetectKeyword() {
@@ -160,10 +177,13 @@ public class MaikaAssistant implements AssistantLifeCycle, SpeechDetector.Speech
     @Override
     public void start() {
         if (isSpeaking){
-            handler.postDelayed(() -> start(),500);
+            handler.postDelayed(() -> start(),100);
         }else {
             detector.listen();
             detectKeywordTimer.start();
+            if (loggingListenner != null && isKeywordDetected){
+                loggingListenner.onListening();
+            }
         }
     }
 
@@ -176,6 +196,9 @@ public class MaikaAssistant implements AssistantLifeCycle, SpeechDetector.Speech
     private void speak(Map<String,String> replacing, String content) {
         if (speaker != null ){
             isSpeaking = true;
+            if (loggingListenner != null){
+                loggingListenner.onSpeaking();
+            }
             Log.d(TAG,"speak content : "+content);
             Set keys = replacing.keySet();
 
@@ -193,8 +216,13 @@ public class MaikaAssistant implements AssistantLifeCycle, SpeechDetector.Speech
     }
 
     private boolean detectKeyword(String content){
-        if (content.length() < 10 && content.toLowerCase().contains("maika")){
-            return true;
+        String[] detects = new String[]{
+                "maika","maica","mycar","maicah","micah"
+        };
+        for (int i=0;i<detects.length;i++){
+            if (content.toLowerCase().replace(" ","").equalsIgnoreCase(detects[i])){
+                return true;
+            }
         }
         return false;
     }
@@ -203,12 +231,21 @@ public class MaikaAssistant implements AssistantLifeCycle, SpeechDetector.Speech
     @Override
     public void onDetectedSpeech(String result) {
         if (!result.isEmpty()){
+            Maikadata.pushLog(result);
             Log.d(TAG,"result "+result);
             if (!isKeywordDetected){
                 isKeywordDetected = detectKeyword(result);
             }
 
             if (isKeywordDetected){
+                if (loggingListenner != null){
+                    loggingListenner.onDetectedKeyword();
+                    loggingListenner.onPostSuggestion(new ArrayList<>(Arrays.asList(new String[]{
+                            "Đăng nhập",
+                            "Chỉ đường cho tôi tới ...",
+                            "Cho tôi gặp thầy/cô/cán bộ ..."
+                    })));
+                }
                 Map<String,String> jeyt = new HashMap<>();
                 jeyt.put("@user",user);
                 String rs = "";
@@ -252,6 +289,41 @@ public class MaikaAssistant implements AssistantLifeCycle, SpeechDetector.Speech
                             } catch (ParseException e) {
                                 Log.e(TAG,"error : "+e.getMessage());
                             }
+                        }else if (rs.contains("Trống")){
+                            if (LoginActivity.db.getUserByName(user) != null){
+                                if (((Teacher)LoginActivity.db.getUserByName(user)).getChucVu().equalsIgnoreCase("Hiệu trưởng")){
+                                    String[] splits = rs.split(" ");
+                                    if (splits.length >=4){
+                                        int date = 0;
+                                        int period = 0;
+                                        if (!splits[2].equals("@date-time")){
+                                            try{
+                                                Date date1=new SimpleDateFormat("dd/MM/yyyy").parse(splits[2]);
+                                                date = DataManager.GetDayInWeek(date1);
+                                            }catch (Exception e){
+                                                Log.e(TAG, "onDetectedSpeech: "+e.getMessage());
+                                            }
+                                        }
+                                        if (!splits[3].equals("@period")){
+                                            try {
+                                                period = Integer.parseInt(splits[4]);
+                                            }catch (Exception e){
+                                                Log.e(TAG, "onDetectedSpeech: "+e.getMessage());
+                                            }
+                                        }
+
+                                        if (date != 0 || period != 0){
+                                            rs = LoginActivity.db.getMissingPeriodTeacher(date,period);
+                                        }else {
+                                            rs = "Tôi không nghe rõ";
+                                        }
+                                    }
+                                }else {
+                                    rs = "Chỉ hiệu trưởng mới được xem lịch trống của cán bộ";
+                                }
+                            }else {
+                                rs = "Chỉ hiệu trưởng mới được xem lịch trống của cán bộ";
+                            }
                         }
                     }
                 }else if (state == LoginState.USER_NAME_WATING){
@@ -268,7 +340,7 @@ public class MaikaAssistant implements AssistantLifeCycle, SpeechDetector.Speech
                 }else if (state == LoginState.PASSWORD_WAITING){
                     Log.d(TAG,"Listenned class :"+result);
                     if (userTemplate != null){
-                        if (result.equalsIgnoreCase(userTemplate.getPassword())){
+                        if (result.replace(" ","").equalsIgnoreCase(userTemplate.getPassword())){
                             state = LoginState.LOGGED_IN;
                             user = userTemplate.getName();
                             speak(jeyt,"Đăng nhập thành công!");
@@ -281,10 +353,13 @@ public class MaikaAssistant implements AssistantLifeCycle, SpeechDetector.Speech
                         }
                     }
                 }else if (result.equalsIgnoreCase("Đăng nhập")){
-                    rs = "Tên bạn là gì?";
-                    state = LoginState.USER_NAME_WATING;
-                    resetLoginStateTimer.cancel();
-                    resetLoginStateTimer.start();
+//                    rs = "Tên bạn là gì?";
+//                    state = LoginState.USER_NAME_WATING;
+//                    resetLoginStateTimer.cancel();
+//                    resetLoginStateTimer.start();
+                    if (loggingListenner != null){
+                        loggingListenner.onOpenLoginLayout();
+                    }
                 }else {
                     rs = getResponse(result);
                     Log.d(TAG,"rs "+rs);
@@ -301,9 +376,12 @@ public class MaikaAssistant implements AssistantLifeCycle, SpeechDetector.Speech
                             }
                         }
                     }else if (rs.contains("Chỉ đường tới khu")){
-                        String place = rs.replace("Chỉ đường tới khu","");
+                        String place = LoginActivity.db.getPlace(rs.replace("Chỉ đường tới khu",""));
                         if (!place.isEmpty()){
                             destination = place;
+                            if (loggingListenner != null){
+                                loggingListenner.onCallGuide(destination);
+                            }
                         }
                         if (position.equals("")){
 
@@ -328,12 +406,14 @@ public class MaikaAssistant implements AssistantLifeCycle, SpeechDetector.Speech
                             rs = LoginActivity.db.getHDD(position,place);
                         }
                     }else if(rs.contains("Vị trí hiện tại")){
-                        String place = rs.replace("Vị trí hiện tại","");
+                        String place = LoginActivity.db.getPlace(rs.replace("Vị trí hiện tại",""));
                         if (!place.isEmpty()){
                             position = place;
+                            if (loggingListenner != null){
+                                loggingListenner.onDetectedPositon(position);
+                            }
                         }
                         if (destination.equals("")){
-
                             int rd = new Random().nextInt();
                             if (rd%3 == 0){
                                 rs = "Bạn muốn đi tới đâu?";
@@ -388,6 +468,14 @@ public class MaikaAssistant implements AssistantLifeCycle, SpeechDetector.Speech
     public interface AssistanceControlListenner{
         void onLoggedIn(String username, String password);
         void onLoggedOut();
+        void onDetectingKeyword();
+        void onDetectedKeyword();
+        void onListening();
+        void onSpeaking();
+        void onOpenLoginLayout();
+        void onPostSuggestion(ArrayList<String> sugestions);
+        void onCallGuide(String destination);
+        void onDetectedPositon(String position);
     }
 
 }

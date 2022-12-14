@@ -14,4 +14,19 @@
     <dimen name="txt_size_lv3">20sp</dimen>
     <dimen name="big_padding">40dp</dimen>
     <dimen name="save_pass_padding">80dp</dimen>
+    <dimen name="point_size">30dp</dimen>
+    <dimen name="location_nha_hieu_bo_top">275dp</dimen>
+    <dimen name="location_nha_hieu_bo_left">140dp</dimen>
+    <dimen name="location_nha_lop_hoc_2t_p8_1_left">185dp</dimen>
+    <dimen name="location_nha_lop_hoc_2t_p8_1_top">240dp</dimen>
+    <dimen name="location_nha_lop_hoc_2t_p8_2_top">245dp</dimen>
+    <dimen name="location_nha_lop_hoc_2t_p8_2_let">95dp</dimen>
+    <dimen name="location_nha_lop_hoc_2t_p4_top">290dp</dimen>
+    <dimen name="location_nha_lop_hoc_2t_p4_left">70dp</dimen>
+    <dimen name="location_nha_lop_hoc_2t_p6_top">180dp</dimen>
+    <dimen name="location_nha_lop_hoc_2t_p6_left">200dp</dimen>
+    <dimen name="location_cong_truong_top">175dp</dimen>
+    <dimen name="location_cong_truong_left">145dp</dimen>
+    <dimen name="location_nha_da_nang_top">215dp</dimen>
+    <dimen name="location_nha_da_nang_left">230dp</dimen>
 </resources>

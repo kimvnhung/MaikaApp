@@ -13,19 +13,25 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.protobuf.StructOrBuilder;
 import com.opencsv.CSVReader;
 
+import org.checkerframework.checker.units.qual.A;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileReader;
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import hung.kv.maikaapp.LoginActivity;
 import maikadata.Maikadata;
@@ -94,6 +100,15 @@ public class DataManager implements DownloadCompletedListenner {
         if (idxA >= 0 && idxB >= 0 && hdd != null){
             if (idxA < hdd.length && idxB <hdd[0].length){
                 return hdd[idxA][idxB];
+            }
+        }
+        return "";
+    }
+
+    public String getPlace(String place){
+        for (int i=0;i<places.size();i++){
+            if(place.replace(" ","").equalsIgnoreCase(places.get(i).replace(" ",""))){
+                return places.get(i);
             }
         }
         return "";
@@ -579,6 +594,15 @@ public class DataManager implements DownloadCompletedListenner {
         return token;
     }
 
+    public int getPlaceIndex(String startP) {
+        for (int i=0;i<places.size();i++){
+            if (startP.replace(" ","").equalsIgnoreCase(places.get(i).replace(" ",""))){
+                return i;
+            }
+        }
+        return -1;
+    }
+
     class DownloadReceiver extends BroadcastReceiver {
         private DownloadCompletedListenner listenner = null;
         public DownloadReceiver(DownloadCompletedListenner listenner) {
@@ -791,6 +815,98 @@ public class DataManager implements DownloadCompletedListenner {
         return null;
     }
 
+    public String getMissingPeriodTeacher(int thu, int period){
+
+        if (thu == 0){
+            thu = GetDayInWeek(new Date());
+        }
+        Map<Integer,ArrayList<String>> listTeacher = new HashMap<>();
+        Date now = new Date();
+
+        String dateString = thu == GetDayInWeek(now)?"Hôm nay":((thu == GetDayInWeek(now)-1)?"Ngày hôm qua":((thu == GetDayInWeek(now)+1)?"Ngày mai":"Ngày thứ "+thu));
+        if (period != 0){
+            ArrayList<String> teacherName = new ArrayList<>();
+            for (int i=0; i<teachers.size(); i++){
+                if (teachers.get(i).getTasks().size() == 0){
+                    teacherName.add(teachers.get(i).getName());
+                }else {
+                    for (int j=0;j<teachers.get(i).getTasks().size();j++){
+                        Task task = teachers.get(i).getTasks().get(j);
+                        if (task.getPeriodStart() == period && GetDayInWeek(task.getFrom()) == thu){
+                            break;
+                        }
+                        if (j==teachers.get(i).getTasks().size()-1){
+                            teacherName.add(teachers.get(i).getName());
+                            break;
+                        }
+                    }
+                }
+            }
+            if (teacherName.size() == 0){
+                return "Không có giáo viên nào trống tiết "+period+" "+dateString;
+            }else {
+                String toReturn = "Các giáo viên trống tiết "+period+" "+dateString+" bao gồm ";
+                for (int i=0;i<teacherName.size();i++){
+                    toReturn += "cán bộ "+teacherName.get(i);
+                    if (i != teacherName.size()-1){
+                        toReturn += ", ";
+                    }
+                }
+
+                return toReturn;
+            }
+        }else {
+            for (int p = 1;p<=5;p++){
+                ArrayList<String> teacherName = new ArrayList<>();
+                for (int i=0; i<teachers.size(); i++){
+                    if (teachers.get(i).getTasks().size() == 0){
+                        teacherName.add(teachers.get(i).getName());
+                    }else {
+                        for (int j=0;j<teachers.get(i).getTasks().size();j++){
+                            Task task = teachers.get(i).getTasks().get(j);
+                            if (task.getPeriodStart() == p && GetDayInWeek(task.getFrom()) == thu){
+                                break;
+                            }
+                            if (j==teachers.get(i).getTasks().size()-1){
+                                teacherName.add(teachers.get(i).getName());
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (teacherName.size() > 0){
+                    listTeacher.put(p,teacherName);
+                }
+            }
+
+            if (listTeacher.size() == 0){
+                return "Không có giáo viên nào trống tiết "+dateString;
+            }else {
+                String toReturn = "Các giáo viên trống tiết "+dateString+" bao gồm";
+                ArrayList<Integer> periods = new ArrayList<>(listTeacher.keySet());
+                for (int i=0;i<periods.size();i++){
+                    ArrayList<String> names = listTeacher.get(periods.get(i));
+                    String nameList = "";
+                    for (int j=0;j<names.size();j++){
+                        nameList += "giáo viên "+names.get(j);
+                        if (j != names.size()-1){
+                            nameList += ", ";
+                        }
+                    }
+                    nameList += " trống tiết "+periods.get(i);
+
+                    toReturn += nameList;
+                    if (i != periods.size()-1){
+                        toReturn += "; ";
+                    }
+                }
+
+                return toReturn;
+            }
+        }
+
+    }
 
     public interface LoadingDataListenner {
         void onDataLoadCompleted();

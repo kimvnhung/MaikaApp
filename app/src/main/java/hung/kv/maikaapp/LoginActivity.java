@@ -1,5 +1,6 @@
 package hung.kv.maikaapp;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -17,17 +18,28 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewStub;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import hung.kv.maikaapp.database.DataManager;
 import hung.kv.maikaapp.database.SchoolPerson;
 import hung.kv.maikaapp.database.Student;
 import hung.kv.maikaapp.database.Teacher;
+import hung.kv.maikaapp.views.SuggestionAdapter;
 import hung.kv.maikaapp.voicehandle.MaikaAssistant;
 import hung.kv.maikaapp.voicehandle.UserType;
 
@@ -53,48 +65,114 @@ public class LoginActivity extends MaikaActivity implements DataManager.LoadingD
             Manifest.permission.ACCESS_NOTIFICATION_POLICY
     };
 
+    RelativeLayout botLayout;
+    ListView botTutorial;
+    ImageView chatBotIcon;
+    boolean isBotLayoutExpanding = true;
+    ArrayList<String> listsuggestion = new ArrayList<>();
+    SuggestionAdapter dataAdapter;
+
+    LinearLayout loginLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        for (int i=0;i<PERMISSION_NAME.length;i++){
-            checkPermission(PERMISSION_NAME[i],i);
-        }
+        checkPermission();
 
-        NotificationManager notificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//        NotificationManager notificationManager =
+//                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//
+//        if (!notificationManager.isNotificationPolicyAccessGranted()) {
+//
+//            Intent intent = new Intent(
+//                    android.provider.Settings
+//                            .ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
+//
+//            startActivity(intent);
+//        }
 
-        if (!notificationManager.isNotificationPolicyAccessGranted()) {
 
-            Intent intent = new Intent(
-                    android.provider.Settings
-                            .ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
-
-            startActivity(intent);
-        }
-
-        initAssistant("Bạn", UserType.GUEST,this);
 
         initView();
+        initBotView();
 
         if (db == null){
             db = new DataManager(this,this);
         }
     }
 
-    // Function to check and request permission
-    public void checkPermission(String permission, int requestCode)
-    {
-        // Checking if permission is not granted
-        if (ContextCompat.checkSelfPermission(LoginActivity.this, permission) == PackageManager.PERMISSION_DENIED) {
-            ActivityCompat.requestPermissions(LoginActivity.this, new String[] { permission }, requestCode);
-        }
+    private void initBotView() {
+        botLayout = findViewById(R.id.include_layout);
+        botLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                if (isBotLayoutExpanding){
+//                    isBotLayoutExpanding = false;
+//                    botLayout.setLayoutResource(R.layout.tini_bot_layout);
+//                    botLayout.inflate();
+//                }else {
+//                    isBotLayoutExpanding = true;
+//                    botLayout.setLayoutResource(R.layout.expand_bot_layout);
+//                    View inflated = botLayout.inflate();
+//
+//
+//                }
+
+                LoginActivity.this.onOpenLoginLayout();
+            }
+        });
+
+        botTutorial = findViewById(R.id.bot_tutorial);
+        chatBotIcon = findViewById(R.id.chat_bot_icon);
+
+        listsuggestion.add("Hey, Maika");
+        listsuggestion.add("Xin chào, Maika");
+
+        // Creating adapter for spinner
+        dataAdapter = new SuggestionAdapter(LoginActivity.this, listsuggestion);
+
+        // attaching data adapter to spinner
+        botTutorial.setAdapter(dataAdapter);
+        botTutorial.setDivider(null);
+
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initAssistant("Bạn", UserType.GUEST,this);
+    }
+
+    // Function to check and request permission
+    public void checkPermission()
+    {
+        // Checking if permission is not granted
+
+        for (int i=0;i<PERMISSION_NAME.length;i++){
+            if (ContextCompat.checkSelfPermission(LoginActivity.this, PERMISSION_NAME[i]) == PackageManager.PERMISSION_DENIED) {
+                break;
+            }
+            if (i==PERMISSION_NAME.length-1){
+                return;
+            }
+        }
+
+        ActivityCompat.requestPermissions(LoginActivity.this, PERMISSION_NAME, 1);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+    }
 
     boolean currentMode = false;
     private void initView() {
+
+        loginLayout = findViewById(R.id.login_layout);
+
         usernameEdt = findViewById(R.id.username_edt);
         passwordEdt = findViewById(R.id.password_edt);
         hintText = findViewById(R.id.hint_text_login);
@@ -139,7 +217,7 @@ public class LoginActivity extends MaikaActivity implements DataManager.LoadingD
         loginAsGuest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startGuestActivity();
+                startGuestActivity("");
             }
         });
 
@@ -194,13 +272,14 @@ public class LoginActivity extends MaikaActivity implements DataManager.LoadingD
         }
     }
 
-    private void startGuestActivity(){
+    private void startGuestActivity(String destination){
         if (db != null && !db.isUpdating()){
             Intent startIntent = new Intent(this,GuestActivity.class);
             startIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startIntent.putExtra("destination",destination);
             startActivity(startIntent);
         }else {
-            handler.postDelayed(()->startGuestActivity(),500);
+            handler.postDelayed(()->startGuestActivity(destination),200);
         }
     }
 
@@ -231,6 +310,57 @@ public class LoginActivity extends MaikaActivity implements DataManager.LoadingD
 
     @Override
     public void onLoggedOut() {
+
+    }
+
+    @Override
+    public void onDetectingKeyword() {
+        chatBotIcon.setImageDrawable(getDrawable(R.drawable.chatbot));
+        botTutorial.setVisibility(View.VISIBLE);
+        botLayout.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onDetectedKeyword() {
+        chatBotIcon.setImageDrawable(getDrawable(R.drawable.chatbot));
+
+        loginLayout.setVisibility(View.GONE);
+        botLayout.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onListening() {
+        chatBotIcon.setImageDrawable(getDrawable(R.drawable.listen));
+        botTutorial.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onSpeaking() {
+        chatBotIcon.setImageDrawable(getDrawable(R.drawable.chatbot));
+        botTutorial.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onOpenLoginLayout() {
+        loginLayout.setVisibility(View.VISIBLE);
+        botLayout.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onPostSuggestion(ArrayList<String> sugestions) {
+        this.listsuggestion.clear();
+        this.listsuggestion.addAll(sugestions);
+        dataAdapter.notifyDataSetChanged();
+        botTutorial.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onCallGuide(String destination) {
+        startGuestActivity(destination);
+    }
+
+    @Override
+    public void onDetectedPositon(String position) {
 
     }
 

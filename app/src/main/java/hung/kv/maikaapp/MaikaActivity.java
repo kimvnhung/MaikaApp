@@ -55,7 +55,7 @@ public class MaikaActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         if (assistant != null){
-            assistant.finish();
+//            assistant.finish();
 
         }
     }

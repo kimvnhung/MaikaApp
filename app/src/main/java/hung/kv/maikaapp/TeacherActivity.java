@@ -9,10 +9,13 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 
 import hung.kv.maikaapp.database.DataManager;
 import hung.kv.maikaapp.database.Task;
@@ -28,6 +31,7 @@ public class TeacherActivity extends MaikaActivity implements MaikaAssistant.Ass
     TextView tenCB,chucVu;
 
     Teacher teacher = null;
+    ImageView chatBotIcon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +46,11 @@ public class TeacherActivity extends MaikaActivity implements MaikaAssistant.Ass
         initAssistant(teacher.getName(), UserType.TEACHER,this);
 
         initView();
+        initBotView();
+    }
+
+    private void initBotView() {
+        chatBotIcon = findViewById(R.id.chat_bot_icon);
     }
 
     private void initView() {
@@ -426,5 +435,51 @@ public class TeacherActivity extends MaikaActivity implements MaikaAssistant.Ass
     @Override
     public void onLoggedOut() {
         this.finish();
+    }
+
+    @Override
+    public void onDetectingKeyword() {
+        chatBotIcon.setImageDrawable(getDrawable(R.drawable.chatbot));
+    }
+
+    @Override
+    public void onDetectedKeyword() {
+        chatBotIcon.setImageDrawable(getDrawable(R.drawable.chatbot));
+//        botTutorial.setVisibility(View.VISIBLE);
+//
+//        loginLayout.setVisibility(View.GONE);
+//        botLayout.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onListening() {
+        chatBotIcon.setImageDrawable(getDrawable(R.drawable.listen));
+//        botTutorial.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onSpeaking() {
+        chatBotIcon.setImageDrawable(getDrawable(R.drawable.chatbot));
+//        botTutorial.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onOpenLoginLayout() {
+
+    }
+
+    @Override
+    public void onPostSuggestion(ArrayList<String> sugestions) {
+
+    }
+
+    @Override
+    public void onCallGuide(String startPlace) {
+
+    }
+
+    @Override
+    public void onDetectedPositon(String position) {
+
     }
 }

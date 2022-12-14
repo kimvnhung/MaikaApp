@@ -48,4 +48,6 @@
     <string name="_6a1">6A1</string>
     <string name="tai_du_lieu">Đang tải dữ liệu vui lòng chờ...</string>
     <string name="luu_thong_tin_dn">Lưu thông tin đăng nhập</string>
+    <string name="maika_tutorial">Hãy nói \'Maika\' hoặc \'Xin chào MaiKa\'</string>
+    <string name="hello_world">Hello World</string>
 </resources>
